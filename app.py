@@ -2,6 +2,9 @@ import streamlit as st
 import requests
 import pandas as pd
 
+import socket
+socket.gethostbyname("services.swpc.noaa.gov")
+
 # --- Real-time Proton Flux from NOAA ---
 proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-electrons-1-day.json"
 try:
