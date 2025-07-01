@@ -89,7 +89,7 @@ except:
 
 # --- Geomagnetic Kp Index ---
 st.header("🧲 Geomagnetic Activity (Kp Index)")
-kp_url = "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
+kp_url = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
 try:
     kp_data = requests.get(kp_url).json()
     latest_kp = float(kp_data[-1]['k_index'])
