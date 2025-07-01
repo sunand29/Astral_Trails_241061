@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 
 # --- Real-time Proton Flux from NOAA ---
-proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
+proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-electrons-1-day.json"
 try:
     proton_data = requests.get(proton_url, timeout=10).json()
     
