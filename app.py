@@ -3,15 +3,33 @@ import requests
 import pandas as pd
 
 # --- Real-time Proton Flux from NOAA ---
+proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
 try:
-    proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
-    proton_data = requests.get(proton_url).json()
-    headers = proton_data[0]       # ['time_tag', 'energy', 'flux', 'satellite', 'channel']
-    last_row = proton_data[-1]     # ['2025-07-01T23:55:00Z', '10.0', '123.45', 'GOES-18', 'P6']
-    data_dict = dict(zip(headers, last_row))
-    flux = float(data_dict['flux'])  # ✅ now this works
+    proton_data = requests.get(proton_url, timeout=10).json()
+    
+    # First row contains the column names
+    headers = proton_data[0]  # ['time_tag', 'energy', 'flux', 'satellite', 'channel']
+    rows = proton_data[1:]    # The actual data
 
-    st.toast("Proton flux fetched successfully!", icon="✅")
+    # Create a DataFrame
+    df = pd.DataFrame(rows, columns=headers)
+
+    # Filter for energy 10.0 MeV from GOES-18 satellite
+    df = df[(df["energy"] == "10.0") & (df["satellite"] == "GOES-18")]
+    
+    # Convert flux column to numeric values
+    df["flux"] = pd.to_numeric(df["flux"], errors="coerce")
+
+    # Drop invalid flux values
+    df.dropna(subset=["flux"], inplace=True)
+
+    # Get the most recent flux value
+    if not df.empty:
+        flux = df["flux"].iloc[-1]
+        st.toast("Proton flux fetched successfully!", icon="✅")
+    else:
+        flux = 100
+        st.warning("No valid flux data available. Using fallback: 100")
 except:
     flux = 100
     st.warning("Could not fetch live proton flux. Using fallback value: 100 p/cm²/s/sr")
