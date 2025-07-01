@@ -48,21 +48,5 @@ with tab2:
     organ_risk = (effective_dose / 1000) * 5 * sex_factor * age_factor
     st.write(f"Organ-weighted Effective Dose: **{effective_dose:.2f} mSv**")
     st.write(f"Adjusted Cancer Risk: **{organ_risk:.2f} %**")
-
-with tab3:
-    st.header("✈️ Flight Dose Estimator")
-    flight = st.selectbox("Flight Path", ["Kanpur to New Delhi", "Delhi to Gujarat", "Delhi to Tamil Nadu"])
-    flight_hours = {"Kanpur to New Delhi": 1, "Delhi to Gujarat": 2, "Delhi to Tamil Nadu": 3}
-    alt_dose_per_hr = 0.005
-    flight_dose = flight_hours[flight] * alt_dose_per_hr
-    st.write(f"Estimated In-Flight Radiation Dose: **{flight_dose:.2f} mSv**")
-
-    st.header("🌍 Altitude & Latitude Dose Variation")
-    altitude_km = st.slider("Altitude (km)", 0, 20, 1)
-    latitude = st.slider("Latitude (degrees)", 0, 90, 45)
-    alt_factor = 2 ** (altitude_km / 2)
-    lat_factor = 1 + (latitude / 90)
-    adjusted_dose = total_dose * alt_factor * lat_factor
-    st.write(f"Adjusted Dose: **{adjusted_dose:.2f} mSv**")
     
 st.caption("Note: This tool is for educational and research purposes only. Data powered by NOAA SWPC & ICRP models.")
