@@ -51,8 +51,8 @@ with tab2:
 
 with tab3:
     st.header("✈️ Flight Dose Estimator")
-    flight = st.selectbox("Flight Path", ["Delhi to New York", "Tokyo to San Francisco", "Paris to Cape Town"])
-    flight_hours = {"Delhi to New York": 15, "Tokyo to San Francisco": 11, "Paris to Cape Town": 12}
+    flight = st.selectbox("Flight Path", ["Kanpur to New Delhi", "Delhi to Gujarat", "Delhi to Tamil Nadu"])
+    flight_hours = {"Kanpur to New Delhi": 1, "Delhi to Gujarat": 2, "Delhi to Tamil Nadu": 3}
     alt_dose_per_hr = 0.005
     flight_dose = flight_hours[flight] * alt_dose_per_hr
     st.write(f"Estimated In-Flight Radiation Dose: **{flight_dose:.2f} mSv**")
@@ -64,5 +64,5 @@ with tab3:
     lat_factor = 1 + (latitude / 90)
     adjusted_dose = total_dose * alt_factor * lat_factor
     st.write(f"Adjusted Dose: **{adjusted_dose:.2f} mSv**")
-
+    
 st.caption("Note: This tool is for educational and research purposes only. Data powered by NOAA SWPC & ICRP models.")
