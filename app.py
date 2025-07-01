@@ -2,67 +2,6 @@ import streamlit as st
 import requests
 import pandas as pd
 
-# # --- Page Config ---
-# st.set_page_config(page_title="Radiation Risk Dashboard", layout="wide")
-# st.title("🚀 Cosmic Radiation Risk Dashboard")
-
-# # --- Real-time Proton Flux from NOAA ---
-# try:
-#     proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
-#     proton_data = requests.get(proton_url).json()
-#     flux = float(proton_data[-1]['flux'])
-#     st.toast("Proton flux fetched successfully!", icon="✅")
-# except:
-#     flux = 100
-#     st.warning("Could not fetch live proton flux. Using fallback value: 100 p/cm²/s/sr")
-
-# # --- Real-time Kp Index from NOAA ---
-# try:
-#     kp_url = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
-#     kp_raw = requests.get(kp_url).json()
-#     kp_df = pd.DataFrame(kp_raw[1:], columns=["time_tag", "kp"])
-#     kp_df["time_tag"] = pd.to_datetime(kp_df["time_tag"])
-#     kp_df["kp"] = kp_df["kp"].astype(float)
-#     latest_kp = kp_df["kp"].iloc[-1]
-# except:
-#     latest_kp = None
-#     st.warning("Could not retrieve Kp index data.")
-
-# # --- Solar Alerts ---
-# try:
-#     alerts_url = "https://services.swpc.noaa.gov/products/alerts.json"
-#     alerts = requests.get(alerts_url).json()
-#     recent_alerts = alerts[-5:]
-# except:
-#     recent_alerts = []
-#     st.warning("Could not fetch SWPC solar alerts.")
-
-# # --- Dashboard Metrics ---
-# col1, col2, col3 = st.columns(3)
-# with col1:
-#     st.metric("☀ Proton Flux (≥10 MeV)", f"{flux:.2e} p/cm²/s/sr")
-# with col2:
-#     if latest_kp is not None:
-#         st.metric("🧲 Kp Index", f"{latest_kp:.2f}")
-#     else:
-#         st.metric("🧲 Kp Index", "--")
-# with col3:
-#     st.markdown("### 🔔 Recent SWPC Alerts")
-#     for a in recent_alerts:
-#         time = a.get('issue_time', 'No time')
-#         msg = a.get('message', 'No message available')
-#         st.caption(f"{time} — {msg}")
-
-# # --- Proton Flux Chart ---
-# try:
-#     df = pd.DataFrame(proton_data)
-#     df['time_tag'] = pd.to_datetime(df['time_tag'])
-#     df['flux'] = df['flux'].astype(float)
-#     st.line_chart(df.set_index('time_tag')['flux'])
-# except:
-#     pass
-
-# --- Main Tabs ---
 tab1, tab2, tab3 = st.tabs(["📊 Risk Assessment", "🧬 Biology Impact", "✈️ Flight Dose"])
 
 with tab1:
