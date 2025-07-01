@@ -13,7 +13,7 @@ except:
     st.warning("Could not fetch live proton flux. Using fallback value: 100 p/cm²/s/sr")
 
 
-tab1, tab2, tab3 = st.tabs(["📊 Risk Assessment", "🧬 Biology Impact", "✈️ Flight Dose"])
+tab1, tab2, tab3 = st.tabs(["📊 Risk Assessment", "🧬 Biology Impact"])
 
 with tab1:
     st.header("📊 Radiation Risk Calculator")
