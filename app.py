@@ -6,7 +6,11 @@ import pandas as pd
 try:
     proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
     proton_data = requests.get(proton_url).json()
-    flux = float(proton_data[-1]['flux'])
+    headers = proton_data[0]       # ['time_tag', 'energy', 'flux', 'satellite', 'channel']
+    last_row = proton_data[-1]     # ['2025-07-01T23:55:00Z', '10.0', '123.45', 'GOES-18', 'P6']
+    data_dict = dict(zip(headers, last_row))
+    flux = float(data_dict['flux'])  # ✅ now this works
+
     st.toast("Proton flux fetched successfully!", icon="✅")
 except:
     flux = 100
