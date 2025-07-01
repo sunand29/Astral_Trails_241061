@@ -2,6 +2,17 @@ import streamlit as st
 import requests
 import pandas as pd
 
+# --- Real-time Proton Flux from NOAA ---
+try:
+    proton_url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
+    proton_data = requests.get(proton_url).json()
+    flux = float(proton_data[-1]['flux'])
+    st.toast("Proton flux fetched successfully!", icon="✅")
+except:
+    flux = 100
+    st.warning("Could not fetch live proton flux. Using fallback value: 100 p/cm²/s/sr")
+
+
 tab1, tab2, tab3 = st.tabs(["📊 Risk Assessment", "🧬 Biology Impact", "✈️ Flight Dose"])
 
 with tab1:
