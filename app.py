@@ -49,7 +49,9 @@ with col2:
 with col3:
     st.markdown("### 🔔 Recent SWPC Alerts")
     for a in recent_alerts:
-        st.caption(f"{a['issue_time']} — {a['message']}")
+        time = a.get('issue_time', 'No time')
+        msg = a.get('message', 'No message available')
+        st.caption(f"{time} — {msg}")
 
 # --- Proton Flux Chart ---
 try:
