@@ -3,16 +3,16 @@
 import streamlit as st
 import requests
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px  # ✅ Replaces matplotlib
 
 st.set_page_config(page_title="Cosmic Ray Data Explorer", layout="wide")
 
 st.title("☄️ Cosmic Ray Data Explorer")
 st.markdown("""
-This app visualizes **cosmic ray flux vs. energy** using real data from the [Cosmic Ray Database (CRDB)](https://lpsc.in2p3.fr/crdb).
+Visualize **cosmic ray flux vs. energy** using real data from the [Cosmic Ray Database (CRDB)](https://lpsc.in2p3.fr/crdb/).
 """)
 
-# --- Selection Controls ---
+# --- Dropdowns
 sources = ['Voyager', 'AMS-02', 'ACE', 'PAMELA', 'SOHO']
 particles = ['Proton (H)', 'Helium (He)', 'Carbon (C)', 'Electron (e−)']
 particle_code = {
@@ -24,54 +24,51 @@ particle_code = {
 
 source = st.selectbox("🔭 Choose Cosmic Ray Source", sources)
 particle = st.selectbox("🧪 Choose Particle Type", particles)
-log_scale = st.checkbox("📉 Use Log Scale for Y-axis (Flux)", value=True)
+log_scale = st.checkbox("📉 Use Log Scale", value=True)
 
-# --- Fetch & Plot Data ---
+# --- Button
 if st.button("📡 Fetch and Plot Cosmic Ray Data"):
-    st.info("Querying CRDB... Please wait.")
-    
-    api_url = f"https://lpsc.in2p3.fr/crdb/api_v1/dataset?exp={source}&nuc={particle_code[particle]}"
-    
+    st.info("Fetching data from CRDB API...")
+
+    query_url = f"https://lpsc.in2p3.fr/crdb/api_v1/dataset?exp={source}&nuc={particle_code[particle]}"
+
     try:
-        response = requests.get(api_url)
+        response = requests.get(query_url)
         data = response.json()
-        
+
         if not data or 'datasets' not in data or len(data['datasets']) == 0:
-            st.warning("No datasets found for this selection.")
+            st.warning("No data found for this selection.")
         else:
             flux_data = []
 
             for dataset in data['datasets']:
                 for point in dataset.get('data', []):
-                    flux_data.append({
-                        'Energy (GeV/n)': point.get('e_kn'),
-                        'Flux': point.get('val')
-                    })
+                    if point.get('e_kn') and point.get('val'):
+                        flux_data.append({
+                            'Energy (GeV/n)': point['e_kn'],
+                            'Flux': point['val']
+                        })
 
-            df = pd.DataFrame(flux_data).dropna()
-            df = df.sort_values('Energy (GeV/n)')
+            df = pd.DataFrame(flux_data).dropna().sort_values(by='Energy (GeV/n)')
 
             if df.empty:
-                st.error("No valid flux data available.")
+                st.error("No usable data points.")
             else:
-                # Plot using matplotlib
-                fig, ax = plt.subplots()
-                ax.plot(df['Energy (GeV/n)'], df['Flux'], marker='o', linestyle='-')
-                ax.set_xlabel("Energy [GeV/nucleon]")
-                ax.set_ylabel("Flux [particles/(m²·sr·s·GeV/n)]")
-                ax.set_title(f"{particle} Flux from {source}")
+                # --- Plotly Chart
+                fig = px.line(df,
+                              x="Energy (GeV/n)",
+                              y="Flux",
+                              title=f"{particle} Flux from {source}",
+                              markers=True,
+                              log_x=True if log_scale else False,
+                              log_y=True if log_scale else False)
+                fig.update_layout(xaxis_title="Energy (GeV/nucleon)",
+                                  yaxis_title="Flux [particles/m²·sr·s·GeV/n]",
+                                  template="plotly_dark")
 
-                if log_scale:
-                    ax.set_yscale('log')
-                    ax.set_xscale('log')
+                st.plotly_chart(fig, use_container_width=True)
 
-                ax.grid(True, which='both', linestyle='--', alpha=0.5)
-                st.pyplot(fig)
+                st.download_button("⬇️ Download CSV", df.to_csv(index=False), file_name=f"{source}_{particle_code[particle]}_flux.csv")
 
-                with st.expander("📄 View Raw Data"):
-                    st.dataframe(df)
-
-                st.download_button("⬇️ Download CSV", data=df.to_csv(index=False), file_name=f"{source}_{particle_code[particle]}_flux.csv", mime="text/csv")
-    
     except Exception as e:
-        st.error(f"Failed to retrieve data: {e}")
+        st.error(f"Error fetching data: {e}")
